@@ -9,31 +9,30 @@ import {
   StyleSheet,
   TouchableOpacity,
 } from "react-native";
-import _ from "lodash";
 import api from "./services/api";
 
 export default function App() {
   const [repositories, setRepositories] = useState([]);
 
+  function sortRepositories(repo) {
+    return repo.sort((actualRepository, nextRepository) => {
+      return nextRepository.likes - actualRepository.likes;
+    });
+  }
+
   useEffect(() => {
     api.get("/repositories").then((response) => {
-      setRepositories(response.data);
+      setRepositories(sortRepositories(response.data));
     });
   }, []);
 
   async function handleLikeRepository(id) {
     const response = await api.post(`/repositories/${id}/like`);
-    const repositoryIndex = repositories.findIndex(
-      (repository) => repository.id === id
+    const filteredArray = repositories.filter(
+      (el) => el.id !== response.data.id
     );
-    const repositoriesCopy = repositories;
-    repositoriesCopy.splice(repositoryIndex, 1);
-    const sortedArray = _.orderBy(
-      [...repositoriesCopy, response.data],
-      ["likes"],
-      ["desc"]
-    );
-    setRepositories(sortedArray);
+    const sortedRepo = sortRepositories([...filteredArray, response.data]);
+    setRepositories(sortedRepo);
   }
 
   return (
