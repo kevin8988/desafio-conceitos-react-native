@@ -15,14 +15,16 @@ export default function App() {
   const [repositories, setRepositories] = useState([]);
 
   function sortRepositories(repo) {
-    return repo.sort((actualRepository, nextRepository) => {
-      return nextRepository.likes - actualRepository.likes;
-    });
+    return repo.sort(
+      (actualRepository, nextRepository) =>
+        nextRepository.likes - actualRepository.likes
+    );
   }
 
   useEffect(() => {
     api.get("/repositories").then((response) => {
-      setRepositories(sortRepositories(response.data));
+      const sortedArray = sortRepositories(response.data);
+      setRepositories(sortedArray);
     });
   }, []);
 
@@ -31,8 +33,8 @@ export default function App() {
     const filteredArray = repositories.filter(
       (el) => el.id !== response.data.id
     );
-    const sortedRepo = sortRepositories([...filteredArray, response.data]);
-    setRepositories(sortedRepo);
+    const sortedArray = sortRepositories([...filteredArray, response.data]);
+    setRepositories(sortedArray);
   }
 
   return (
